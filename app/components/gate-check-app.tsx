@@ -1,7 +1,6 @@
 'use client'
-
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Shield, ScanLine, CheckCircle2, XCircle, RotateCcw, Package, Lock, Download, Share2 } from 'lucide-react'
+import { Shield, ScanLine, CheckCircle2, XCircle, RotateCcw, Package, Lock, Download, Share2, Info } from 'lucide-react'
 
 type Screen =
   | 'home'
@@ -11,7 +10,6 @@ type Screen =
   | 'verify-step2'
   | 'result-match'
   | 'result-mismatch'
-  | 'paywall'
 
 declare global {
   interface Window {
@@ -27,28 +25,12 @@ async function sha256(input: string): Promise<string> {
   return hashArray.map((b: number) => b.toString(16).padStart(2, '0')).join('')
 }
 
-function getVerifyCount(): number {
-  try {
-    const val = localStorage.getItem('gatecheck_verifications')
-    return val ? parseInt(val, 10) || 0 : 0
-  } catch {
-    return 0
-  }
-}
-
-function incrementVerifyCount(): number {
-  const next = getVerifyCount() + 1
-  try {
-    localStorage.setItem('gatecheck_verifications', String(next))
-  } catch {}
-  return next
-}
-
 export default function GateCheckApp() {
   const [screen, setScreen] = useState<Screen>('home')
   const [scannedItems, setScannedItems] = useState<string[]>([])
   const [masterHash, setMasterHash] = useState<string>('')
   const [storedHash, setStoredHash] = useState<string>('')
+  const [showHow, setShowHow] = useState(false)
   const scannerRef = useRef<any>(null)
   const qrContainerRef = useRef<HTMLDivElement>(null)
   const scannerDivId = 'qr-reader'
@@ -269,14 +251,8 @@ export default function GateCheckApp() {
 
   const finishVerify = useCallback(async () => {
     await stopScanner()
-    const count = getVerifyCount()
-    if (count >= 10) {
-      setScreen('paywall')
-      return
-    }
     const concatenated = scannedItems.join('')
     const hash = await sha256(concatenated)
-    incrementVerifyCount()
     if (hash === storedHash) {
       setScreen('result-match')
     } else {
@@ -285,17 +261,43 @@ export default function GateCheckApp() {
   }, [scannedItems, storedHash, stopScanner])
 
   // ---------- RESULTS ----------
+  const linkedInPostUrl =
+    'https://www.linkedin.com/posts/victor-khalif-ltp_liabilitytrap-supplychain-lastmile-activity-7487550905509392384-R1gd'
+
   if (screen === 'result-match') {
     return (
-      <div className="fixed inset-0 flex flex-col items-center justify-center" style={{ backgroundColor: '#00e676' }}>
-        <CheckCircle2 size={96} color="#0a0a0a" />
-        <p className="mt-4 text-5xl font-bold" style={{ color: '#0a0a0a' }}>✓ MATCH</p>
+      <div
+        className="fixed inset-0 flex flex-col items-center justify-center px-6"
+        style={{ backgroundColor: '#00e676' }}
+      >
+        <CheckCircle2 size={80} color="#0a0a0a" />
+        <p className="mt-3 text-4xl font-bold" style={{ color: '#0a0a0a' }}>
+          ✓ MATCH
+        </p>
+        <p className="mt-6 max-w-sm text-center text-sm leading-relaxed" style={{ color: '#0a0a0a' }}>
+          Verification complete. No data stored. No server involved.
+          <br />
+          <br />
+          This is the mathematical evidence layer that closes the liability gap at physical transfer.
+          <br />
+          <br />
+          Full architectural breakdown:
+        </p>
+        <a
+          href={linkedInPostUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 flex w-full max-w-xs items-center justify-center rounded-lg px-6 py-4 text-base font-bold"
+          style={{ backgroundColor: '#0A66C2', color: '#ffffff', minHeight: 56 }}
+        >
+          Read the analysis on LinkedIn
+        </a>
         <button
           onClick={goHome}
-          className="mt-10 flex items-center gap-2 rounded-lg px-8 py-4 text-lg font-semibold"
-          style={{ backgroundColor: '#0a0a0a', color: '#f0f0f0', minHeight: 56 }}
+          className="mt-4 flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold"
+          style={{ backgroundColor: '#0a0a0a', color: '#f0f0f0', minHeight: 48 }}
         >
-          <RotateCcw size={20} /> Start Over
+          <RotateCcw size={16} /> Start Over
         </button>
       </div>
     )
@@ -303,43 +305,38 @@ export default function GateCheckApp() {
 
   if (screen === 'result-mismatch') {
     return (
-      <div className="fixed inset-0 flex flex-col items-center justify-center" style={{ backgroundColor: '#ff1744' }}>
-        <XCircle size={96} color="#0a0a0a" />
-        <p className="mt-4 text-5xl font-bold" style={{ color: '#0a0a0a' }}>✗ MISMATCH</p>
+      <div
+        className="fixed inset-0 flex flex-col items-center justify-center px-6"
+        style={{ backgroundColor: '#ff1744' }}
+      >
+        <XCircle size={80} color="#0a0a0a" />
+        <p className="mt-3 text-4xl font-bold" style={{ color: '#0a0a0a' }}>
+          ✗ MISMATCH
+        </p>
+        <p className="mt-6 max-w-sm text-center text-sm leading-relaxed" style={{ color: '#0a0a0a' }}>
+          Mismatch detected. In a live gate this shipment is blocked.
+          <br />
+          <br />
+          You just saw the exact failure mode that leaves the middle party exposed to unprovable liability.
+          <br />
+          <br />
+          Full breakdown of the liability trap:
+        </p>
+        <a
+          href={linkedInPostUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 flex w-full max-w-xs items-center justify-center rounded-lg px-6 py-4 text-base font-bold"
+          style={{ backgroundColor: '#0A66C2', color: '#ffffff', minHeight: 56 }}
+        >
+          Read the analysis on LinkedIn
+        </a>
         <button
           onClick={goHome}
-          className="mt-10 flex items-center gap-2 rounded-lg px-8 py-4 text-lg font-semibold"
-          style={{ backgroundColor: '#0a0a0a', color: '#f0f0f0', minHeight: 56 }}
+          className="mt-4 flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold"
+          style={{ backgroundColor: '#0a0a0a', color: '#f0f0f0', minHeight: 48 }}
         >
-          <RotateCcw size={20} /> Start Over
-        </button>
-      </div>
-    )
-  }
-
-  if (screen === 'paywall') {
-    return (
-      <div className="fixed inset-0 flex flex-col items-center justify-center px-6" style={{ backgroundColor: '#0a0a0a' }}>
-        <Shield size={56} style={{ color: '#00e676' }} />
-        <h1 className="mt-4 text-3xl font-bold tracking-tight" style={{ color: '#f0f0f0' }}>GateCheck</h1>
-        <p className="mt-6 text-center text-lg" style={{ color: '#f0f0f0' }}>
-          You&apos;ve used your 10 free checks
-        </p>
-        <p className="mt-2 text-center text-2xl font-semibold" style={{ color: '#00e676' }}>
-          $4.99 / month — unlimited checks
-        </p>
-        <button
-          className="mt-8 w-full max-w-xs rounded-lg px-8 py-4 text-lg font-bold"
-          style={{ backgroundColor: '#00e676', color: '#0a0a0a', minHeight: 56 }}
-        >
-          Upgrade Now
-        </button>
-        <button
-          onClick={goHome}
-          className="mt-8 flex items-center gap-2 text-sm"
-          style={{ color: '#666' }}
-        >
-          <RotateCcw size={14} /> Back to Home
+          <RotateCcw size={16} /> Start Over
         </button>
       </div>
     )
@@ -352,7 +349,6 @@ export default function GateCheckApp() {
       style={{ backgroundColor: '#0a0a0a', height: '100dvh' }}
     >
       <div className="mx-auto flex h-full w-full max-w-[480px] flex-col overflow-hidden px-4 pb-4 pt-3">
-
         {/* HOME */}
         {screen === 'home' && (
           <div className="flex flex-col">
@@ -384,6 +380,31 @@ export default function GateCheckApp() {
                 <ScanLine size={28} /> VERIFY (Destination)
               </button>
             </div>
+
+            <button
+              onClick={() => setShowHow(!showHow)}
+              className="mt-6 flex items-center justify-center gap-2 text-sm"
+              style={{ color: '#666' }}
+            >
+              <Info size={14} /> How it works
+            </button>
+
+            {showHow && (
+              <div className="mt-3 rounded-lg p-4 text-xs leading-relaxed" style={{ backgroundColor: '#151515', color: '#aaa' }}>
+                <p className="mb-2">
+                  1. Origin scans items → SHA-256 produces a master hash.
+                </p>
+                <p className="mb-2">
+                  2. Hash is encoded into a QR. No data is stored anywhere.
+                </p>
+                <p className="mb-2">
+                  3. Destination scans the master QR + the same items.
+                </p>
+                <p>
+                  4. Same computation is repeated. Match = gate opens. Mismatch = gate stays closed. Check runs in RAM and disappears.
+                </p>
+              </div>
+            )}
           </div>
         )}
 
@@ -438,6 +459,16 @@ export default function GateCheckApp() {
             <div className="rounded-xl p-3" style={{ backgroundColor: '#0a0a0a' }}>
               <div ref={qrContainerRef} className="[&_img]:mx-auto [&_canvas]:mx-auto" />
             </div>
+
+            <div className="w-full rounded-lg p-3" style={{ backgroundColor: '#151515' }}>
+              <p className="mb-1 text-center text-xs uppercase" style={{ color: '#888' }}>
+                SHA-256 Master Hash
+              </p>
+              <p className="break-all text-center font-mono text-xs" style={{ color: '#00e676' }}>
+                {masterHash}
+              </p>
+            </div>
+
             <div className="flex w-full gap-3">
               <button
                 onClick={saveQR}
@@ -461,9 +492,6 @@ export default function GateCheckApp() {
             >
               <ScanLine size={20} /> Use for Verify
             </button>
-            <p className="w-full truncate text-center font-mono text-xs" style={{ color: '#888' }}>
-              {masterHash}
-            </p>
             <button onClick={goHome} className="flex items-center justify-center gap-2 py-1 text-sm" style={{ color: '#666' }}>
               <RotateCcw size={16} /> Start Over
             </button>
