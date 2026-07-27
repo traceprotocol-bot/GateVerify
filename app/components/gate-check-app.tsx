@@ -364,33 +364,39 @@ export default function GateCheckApp() {
       className="fixed inset-0 flex flex-col overflow-hidden"
       style={{ backgroundColor: '#0a0a0a', height: '100dvh' }}
     >
-      <div className="mx-auto flex h-full w-full max-w-[480px] flex-col overflow-hidden px-4 pb-4 pt-6">
-        {/* Header */}
-        <div className="mb-6 flex flex-shrink-0 items-center justify-center gap-2">
-          <Shield size={26} style={{ color: '#00e676' }} />
-          <h1 className="text-2xl font-bold tracking-tight" style={{ color: '#f0f0f0' }}>GateCheck</h1>
-        </div>
-
+      <div className="mx-auto flex h-full w-full max-w-[480px] flex-col overflow-hidden px-4 pb-4 pt-4">
+        
         {/* HOME */}
         {screen === 'home' && (
-          <div className="flex flex-1 flex-col items-center justify-start gap-5 pt-8">
-            <p className="mb-4 text-center text-sm" style={{ color: '#888' }}>
-              Mathematical verification of physical handovers
-            </p>
-            <button
-              onClick={startSeal}
-              className="flex w-full items-center justify-center gap-3 rounded-xl px-6 py-5 text-xl font-bold"
-              style={{ backgroundColor: '#00e676', color: '#0a0a0a', minHeight: 72 }}
-            >
-              <Package size={28} /> SEAL (Origin)
-            </button>
-            <button
-              onClick={startVerify}
-              className="flex w-full items-center justify-center gap-3 rounded-xl border-2 px-6 py-5 text-xl font-bold"
-              style={{ borderColor: '#00e676', color: '#00e676', backgroundColor: 'transparent', minHeight: 72 }}
-            >
-              <ScanLine size={28} /> VERIFY (Destination)
-            </button>
+          <div className="flex flex-col gap-3">
+            {/* Header + subtitle близко друг к другу */}
+            <div className="flex flex-col items-center gap-1 pt-2">
+              <div className="flex items-center gap-2">
+                <Shield size={28} style={{ color: '#00e676' }} />
+                <h1 className="text-2xl font-bold tracking-tight" style={{ color: '#f0f0f0' }}>GateCheck</h1>
+              </div>
+              <p className="text-center text-xs" style={{ color: '#888' }}>
+                Mathematical verification of physical handovers
+              </p>
+            </div>
+
+            {/* Кнопки сразу под заголовком */}
+            <div className="mt-6 flex flex-col gap-4">
+              <button
+                onClick={startSeal}
+                className="flex w-full items-center justify-center gap-3 rounded-xl px-6 py-5 text-xl font-bold"
+                style={{ backgroundColor: '#00e676', color: '#0a0a0a', minHeight: 72 }}
+              >
+                <Package size={28} /> SEAL (Origin)
+              </button>
+              <button
+                onClick={startVerify}
+                className="flex w-full items-center justify-center gap-3 rounded-xl border-2 px-6 py-5 text-xl font-bold"
+                style={{ borderColor: '#00e676', color: '#00e676', backgroundColor: 'transparent', minHeight: 72 }}
+              >
+                <ScanLine size={28} /> VERIFY (Destination)
+              </button>
+            </div>
           </div>
         )}
 
@@ -497,44 +503,4 @@ export default function GateCheckApp() {
 
         {/* VERIFY STEP 2 */}
         {screen === 'verify-step2' && (
-          <div className="flex min-h-0 flex-1 flex-col gap-2">
-            <p className="flex-shrink-0 text-center text-xs font-semibold uppercase tracking-wide" style={{ color: '#00e676' }}>
-              Verify — Step 2: Scan Items
-            </p>
-            <div
-              id={scannerDivId}
-              className="flex-shrink-0 overflow-hidden rounded-lg bg-black"
-              style={{ width: '100%', height: '40vh' }}
-            />
-            <div className="flex min-h-0 flex-1 flex-col rounded-lg p-2" style={{ backgroundColor: '#151515' }}>
-              <p className="mb-1 flex-shrink-0 text-xs font-semibold uppercase" style={{ color: '#888' }}>
-                Scanned ({scannedItems?.length ?? 0})
-              </p>
-              <ul className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto">
-                {(scannedItems ?? []).map((item: string, i: number) => (
-                  <li key={`${i}-${item}`} className="truncate font-mono text-xs" style={{ color: '#f0f0f0' }}>
-                    {i + 1}. {item}
-                  </li>
-                ))}
-                {(scannedItems?.length ?? 0) === 0 && (
-                  <li className="font-mono text-xs" style={{ color: '#555' }}>Point camera at a barcode…</li>
-                )}
-              </ul>
-            </div>
-            <button
-              onClick={finishVerify}
-              disabled={(scannedItems?.length ?? 0) === 0}
-              className="flex w-full flex-shrink-0 items-center justify-center gap-2 rounded-lg px-6 py-4 text-lg font-bold disabled:opacity-40"
-              style={{ backgroundColor: '#00e676', color: '#0a0a0a', minHeight: 56 }}
-            >
-              <Lock size={20} /> Verify Now
-            </button>
-            <button onClick={goHome} className="flex flex-shrink-0 items-center justify-center gap-2 py-1 text-sm" style={{ color: '#666' }}>
-              <RotateCcw size={14} /> Start Over
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
+          <div className
