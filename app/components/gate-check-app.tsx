@@ -1,4 +1,5 @@
 'use client'
+
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Shield, ScanLine, CheckCircle2, XCircle, RotateCcw, Package, Lock, Download, Share2 } from 'lucide-react'
 
@@ -48,7 +49,6 @@ export default function GateCheckApp() {
   const [scannedItems, setScannedItems] = useState<string[]>([])
   const [masterHash, setMasterHash] = useState<string>('')
   const [storedHash, setStoredHash] = useState<string>('')
-  const [scanning, setScanning] = useState(false)
   const scannerRef = useRef<any>(null)
   const qrContainerRef = useRef<HTMLDivElement>(null)
   const scannerDivId = 'qr-reader'
@@ -65,7 +65,6 @@ export default function GateCheckApp() {
       }
     } catch {}
     scannerRef.current = null
-    setScanning(false)
   }, [])
 
   const startScanner = useCallback(
@@ -76,18 +75,14 @@ export default function GateCheckApp() {
           await stopScanner()
           const html5Qr = new window.Html5Qrcode(scannerDivId)
           scannerRef.current = html5Qr
-          setScanning(true)
           await html5Qr.start(
             { facingMode: 'environment' },
             { fps: 10, qrbox: { width: 250, height: 250 } },
-            (decodedText: string) => {
-              onScan(decodedText)
-            },
+            (decodedText: string) => onScan(decodedText),
             () => {}
           )
-        } catch (err: any) {
+        } catch (err) {
           console.error('Scanner start error', err)
-          setScanning(false)
         }
       }, 300)
     },
@@ -135,9 +130,8 @@ export default function GateCheckApp() {
       drawSource(srcCanvas)
     } else if (srcImg) {
       await new Promise<void>((resolve) => {
-        if (srcImg.complete && srcImg.naturalWidth > 0) {
-          resolve()
-        } else {
+        if (srcImg.complete && srcImg.naturalWidth > 0) resolve()
+        else {
           srcImg.onload = () => resolve()
           srcImg.onerror = () => resolve()
         }
@@ -146,7 +140,7 @@ export default function GateCheckApp() {
     } else {
       return null
     }
-    return new Promise<Blob | null>((resolve) => {
+    return new Promise((resolve) => {
       out.toBlob((b) => resolve(b), 'image/png')
     })
   }, [])
@@ -201,7 +195,7 @@ export default function GateCheckApp() {
   useEffect(() => {
     if (screen === 'seal-scanning') {
       startScanner((text: string) => {
-        setScannedItems((prev: string[]) => {
+        setScannedItems((prev) => {
           if (prev[prev.length - 1] === text) return prev
           return [...prev, text]
         })
@@ -265,7 +259,7 @@ export default function GateCheckApp() {
   useEffect(() => {
     if (screen === 'verify-step2') {
       startScanner((text: string) => {
-        setScannedItems((prev: string[]) => {
+        setScannedItems((prev) => {
           if (prev[prev.length - 1] === text) return prev
           return [...prev, text]
         })
@@ -290,6 +284,7 @@ export default function GateCheckApp() {
     }
   }, [scannedItems, storedHash, stopScanner])
 
+  // ---------- RESULTS ----------
   if (screen === 'result-match') {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center" style={{ backgroundColor: '#00e676' }}>
@@ -334,20 +329,11 @@ export default function GateCheckApp() {
           $4.99 / month — unlimited checks
         </p>
         <button
-          id="upgrade-btn"
           className="mt-8 w-full max-w-xs rounded-lg px-8 py-4 text-lg font-bold"
           style={{ backgroundColor: '#00e676', color: '#0a0a0a', minHeight: 56 }}
         >
           Upgrade Now
         </button>
-        <a
-          href="#"
-          className="mt-4 text-sm underline"
-          style={{ color: '#888' }}
-          onClick={(e: React.MouseEvent) => e.preventDefault()}
-        >
-          Learn More
-        </a>
         <button
           onClick={goHome}
           className="mt-8 flex items-center gap-2 text-sm"
@@ -359,29 +345,30 @@ export default function GateCheckApp() {
     )
   }
 
+  // ---------- MAIN UI ----------
   return (
     <div
       className="fixed inset-0 flex flex-col overflow-hidden"
       style={{ backgroundColor: '#0a0a0a', height: '100dvh' }}
     >
-      <div className="mx-auto flex h-full w-full max-w-[480px] flex-col overflow-hidden px-4 pb-4 pt-4">
-        
+      <div className="mx-auto flex h-full w-full max-w-[480px] flex-col overflow-hidden px-4 pb-4 pt-3">
+
         {/* HOME */}
         {screen === 'home' && (
-          <div className="flex flex-col gap-3">
-            {/* Header + subtitle близко друг к другу */}
-            <div className="flex flex-col items-center gap-1 pt-2">
+          <div className="flex flex-col">
+            <div className="flex flex-col items-center gap-1 pt-1">
               <div className="flex items-center gap-2">
                 <Shield size={28} style={{ color: '#00e676' }} />
-                <h1 className="text-2xl font-bold tracking-tight" style={{ color: '#f0f0f0' }}>GateCheck</h1>
+                <h1 className="text-2xl font-bold tracking-tight" style={{ color: '#f0f0f0' }}>
+                  GateCheck
+                </h1>
               </div>
               <p className="text-center text-xs" style={{ color: '#888' }}>
                 Mathematical verification of physical handovers
               </p>
             </div>
 
-            {/* Кнопки сразу под заголовком */}
-            <div className="mt-6 flex flex-col gap-4">
+            <div className="mt-8 flex flex-col gap-4">
               <button
                 onClick={startSeal}
                 className="flex w-full items-center justify-center gap-3 rounded-xl px-6 py-5 text-xl font-bold"
@@ -403,38 +390,40 @@ export default function GateCheckApp() {
         {/* SEAL SCANNING */}
         {screen === 'seal-scanning' && (
           <div className="flex min-h-0 flex-1 flex-col gap-2">
-            <p className="flex-shrink-0 text-center text-xs font-semibold uppercase tracking-wide" style={{ color: '#00e676' }}>
+            <p className="text-center text-xs font-semibold uppercase tracking-wide" style={{ color: '#00e676' }}>
               Seal Mode — Scan Items
             </p>
             <div
               id={scannerDivId}
-              className="flex-shrink-0 overflow-hidden rounded-lg bg-black"
+              className="overflow-hidden rounded-lg bg-black"
               style={{ width: '100%', height: '38vh' }}
             />
             <div className="flex min-h-0 flex-1 flex-col rounded-lg p-2" style={{ backgroundColor: '#151515' }}>
-              <p className="mb-1 flex-shrink-0 text-xs font-semibold uppercase" style={{ color: '#888' }}>
-                Scanned ({scannedItems?.length ?? 0})
+              <p className="mb-1 text-xs font-semibold uppercase" style={{ color: '#888' }}>
+                Scanned ({scannedItems.length})
               </p>
               <ul className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto">
-                {(scannedItems ?? []).map((item: string, i: number) => (
+                {scannedItems.map((item, i) => (
                   <li key={`${i}-${item}`} className="truncate font-mono text-xs" style={{ color: '#f0f0f0' }}>
                     {i + 1}. {item}
                   </li>
                 ))}
-                {(scannedItems?.length ?? 0) === 0 && (
-                  <li className="font-mono text-xs" style={{ color: '#555' }}>Point camera at a barcode…</li>
+                {scannedItems.length === 0 && (
+                  <li className="font-mono text-xs" style={{ color: '#555' }}>
+                    Point camera at a barcode…
+                  </li>
                 )}
               </ul>
             </div>
             <button
               onClick={finishSeal}
-              disabled={(scannedItems?.length ?? 0) === 0}
-              className="flex w-full flex-shrink-0 items-center justify-center gap-2 rounded-lg px-6 py-4 text-lg font-bold disabled:opacity-40"
+              disabled={scannedItems.length === 0}
+              className="flex w-full items-center justify-center gap-2 rounded-lg px-6 py-4 text-lg font-bold disabled:opacity-40"
               style={{ backgroundColor: '#00e676', color: '#0a0a0a', minHeight: 56 }}
             >
               Done — Generate Master QR
             </button>
-            <button onClick={goHome} className="flex flex-shrink-0 items-center justify-center gap-2 py-1 text-sm" style={{ color: '#666' }}>
+            <button onClick={goHome} className="flex items-center justify-center gap-2 py-1 text-sm" style={{ color: '#666' }}>
               <RotateCcw size={14} /> Start Over
             </button>
           </div>
@@ -443,13 +432,13 @@ export default function GateCheckApp() {
         {/* SEAL RESULT */}
         {screen === 'seal-result' && (
           <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3">
-            <p className="flex-shrink-0 text-center text-xs font-semibold uppercase tracking-wide" style={{ color: '#00e676' }}>
+            <p className="text-center text-xs font-semibold uppercase tracking-wide" style={{ color: '#00e676' }}>
               Master QR Code
             </p>
-            <div className="flex-shrink-0 rounded-xl p-3" style={{ backgroundColor: '#0a0a0a' }}>
+            <div className="rounded-xl p-3" style={{ backgroundColor: '#0a0a0a' }}>
               <div ref={qrContainerRef} className="[&_img]:mx-auto [&_canvas]:mx-auto" />
             </div>
-            <div className="flex w-full flex-shrink-0 gap-3">
+            <div className="flex w-full gap-3">
               <button
                 onClick={saveQR}
                 className="flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 text-base font-bold"
@@ -467,15 +456,15 @@ export default function GateCheckApp() {
             </div>
             <button
               onClick={useForVerify}
-              className="flex w-full flex-shrink-0 items-center justify-center gap-2 rounded-lg px-4 py-3 text-base font-bold"
+              className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-base font-bold"
               style={{ backgroundColor: '#1a1a1a', color: '#00e676', minHeight: 56 }}
             >
               <ScanLine size={20} /> Use for Verify
             </button>
-            <p className="w-full flex-shrink-0 truncate text-center font-mono text-xs" style={{ color: '#888' }}>
-              {masterHash ?? ''}
+            <p className="w-full truncate text-center font-mono text-xs" style={{ color: '#888' }}>
+              {masterHash}
             </p>
-            <button onClick={goHome} className="flex flex-shrink-0 items-center justify-center gap-2 py-1 text-sm" style={{ color: '#666' }}>
+            <button onClick={goHome} className="flex items-center justify-center gap-2 py-1 text-sm" style={{ color: '#666' }}>
               <RotateCcw size={16} /> Start Over
             </button>
           </div>
@@ -484,18 +473,18 @@ export default function GateCheckApp() {
         {/* VERIFY STEP 1 */}
         {screen === 'verify-step1' && (
           <div className="flex min-h-0 flex-1 flex-col gap-3">
-            <p className="flex-shrink-0 text-center text-xs font-semibold uppercase tracking-wide" style={{ color: '#00e676' }}>
+            <p className="text-center text-xs font-semibold uppercase tracking-wide" style={{ color: '#00e676' }}>
               Verify — Step 1: Scan Master QR
             </p>
             <div
               id={scannerDivId}
-              className="flex-shrink-0 overflow-hidden rounded-lg bg-black"
+              className="overflow-hidden rounded-lg bg-black"
               style={{ width: '100%', height: '50vh' }}
             />
-            <p className="flex-1 text-center text-xs" style={{ color: '#555' }}>
+            <p className="text-center text-xs" style={{ color: '#555' }}>
               Point camera at the Master QR code from the origin.
             </p>
-            <button onClick={goHome} className="flex flex-shrink-0 items-center justify-center gap-2 py-2 text-sm" style={{ color: '#666' }}>
+            <button onClick={goHome} className="flex items-center justify-center gap-2 py-2 text-sm" style={{ color: '#666' }}>
               <RotateCcw size={14} /> Start Over
             </button>
           </div>
@@ -503,4 +492,46 @@ export default function GateCheckApp() {
 
         {/* VERIFY STEP 2 */}
         {screen === 'verify-step2' && (
-          <div className
+          <div className="flex min-h-0 flex-1 flex-col gap-2">
+            <p className="text-center text-xs font-semibold uppercase tracking-wide" style={{ color: '#00e676' }}>
+              Verify — Step 2: Scan Items
+            </p>
+            <div
+              id={scannerDivId}
+              className="overflow-hidden rounded-lg bg-black"
+              style={{ width: '100%', height: '40vh' }}
+            />
+            <div className="flex min-h-0 flex-1 flex-col rounded-lg p-2" style={{ backgroundColor: '#151515' }}>
+              <p className="mb-1 text-xs font-semibold uppercase" style={{ color: '#888' }}>
+                Scanned ({scannedItems.length})
+              </p>
+              <ul className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto">
+                {scannedItems.map((item, i) => (
+                  <li key={`${i}-${item}`} className="truncate font-mono text-xs" style={{ color: '#f0f0f0' }}>
+                    {i + 1}. {item}
+                  </li>
+                ))}
+                {scannedItems.length === 0 && (
+                  <li className="font-mono text-xs" style={{ color: '#555' }}>
+                    Point camera at a barcode…
+                  </li>
+                )}
+              </ul>
+            </div>
+            <button
+              onClick={finishVerify}
+              disabled={scannedItems.length === 0}
+              className="flex w-full items-center justify-center gap-2 rounded-lg px-6 py-4 text-lg font-bold disabled:opacity-40"
+              style={{ backgroundColor: '#00e676', color: '#0a0a0a', minHeight: 56 }}
+            >
+              <Lock size={20} /> Verify Now
+            </button>
+            <button onClick={goHome} className="flex items-center justify-center gap-2 py-1 text-sm" style={{ color: '#666' }}>
+              <RotateCcw size={14} /> Start Over
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
