@@ -296,11 +296,9 @@ export default function GateCheckApp() {
         </p>
 
         <p className="mt-6 max-w-sm text-center text-sm leading-relaxed font-medium" style={{ color: '#0a0a0a' }}>
-          The physical items are identical to what was sealed at origin.
+          Payload confirmed.
           <br /><br />
-          No database. No server. No data stored.
-          <br />
-          Just pure mathematical proof at the moment of handover.
+          You just verified a physical handover with mathematical certainty — no server, no database, no data stored.
         </p>
 
         <a
@@ -334,11 +332,9 @@ export default function GateCheckApp() {
         </p>
 
         <p className="mt-6 max-w-sm text-center text-sm leading-relaxed font-medium" style={{ color: '#0a0a0a' }}>
-          The physical items no longer match what was sealed at origin.
+          Critical integrity failure.
           <br /><br />
-          In a live gate this shipment is rejected.
-          <br />
-          This is the exact failure that currently leaves the middle party with unprovable liability.
+          The physical payload does not match the seal. In a live supply chain you just blocked a liability transfer.
         </p>
 
         <a
@@ -377,31 +373,38 @@ export default function GateCheckApp() {
                   GateCheck
                 </h1>
               </div>
-              <p className="text-center text-xs" style={{ color: '#888' }}>
-                Mathematical verification of physical handovers
+              <p className="mt-1 text-center text-xs leading-snug" style={{ color: '#888', maxWidth: 280 }}>
+                Prove what is physically present — not what the label says
               </p>
             </div>
 
-            <div className="mt-8 flex flex-col gap-4">
+            <div className="mt-10 flex flex-col gap-4">
               <button
                 onClick={startSeal}
-                className="flex w-full items-center justify-center gap-3 rounded-xl px-6 py-5 text-xl font-bold"
-                style={{ backgroundColor: '#00e676', color: '#0a0a0a', minHeight: 72 }}
+                className="flex w-full flex-col items-center justify-center gap-1 rounded-xl px-6 py-5"
+                style={{ backgroundColor: '#00e676', color: '#0a0a0a', minHeight: 88 }}
               >
-                <Package size={28} /> SEAL (Origin)
+                <div className="flex items-center gap-3 text-xl font-bold">
+                  <Package size={26} /> SEAL (Origin)
+                </div>
+                <span className="text-xs font-medium opacity-80">I am securing the physical payload</span>
               </button>
+
               <button
                 onClick={startVerify}
-                className="flex w-full items-center justify-center gap-3 rounded-xl border-2 px-6 py-5 text-xl font-bold"
-                style={{ borderColor: '#00e676', color: '#00e676', backgroundColor: 'transparent', minHeight: 72 }}
+                className="flex w-full flex-col items-center justify-center gap-1 rounded-xl border-2 px-6 py-5"
+                style={{ borderColor: '#00e676', color: '#00e676', backgroundColor: 'transparent', minHeight: 88 }}
               >
-                <ScanLine size={28} /> VERIFY (Destination)
+                <div className="flex items-center gap-3 text-xl font-bold">
+                  <ScanLine size={26} /> VERIFY (Destination)
+                </div>
+                <span className="text-xs font-medium opacity-80">I am receiving the payload</span>
               </button>
             </div>
 
             <button
               onClick={() => setShowHow(!showHow)}
-              className="mt-6 flex items-center justify-center gap-2 text-sm"
+              className="mt-8 flex items-center justify-center gap-2 text-sm"
               style={{ color: '#666' }}
             >
               <Info size={14} /> How it works
@@ -410,16 +413,16 @@ export default function GateCheckApp() {
             {showHow && (
               <div className="mt-3 rounded-lg p-4 text-xs leading-relaxed" style={{ backgroundColor: '#151515', color: '#aaa' }}>
                 <p className="mb-2">
-                  1. Origin scans items → SHA-256 produces a master hash.
+                  1. Origin seals the physical items → a Master QR is generated locally.
                 </p>
                 <p className="mb-2">
-                  2. Hash is encoded into a QR. No data is stored anywhere.
+                  2. Zero data leaves the device. The QR can be sent by any channel.
                 </p>
                 <p className="mb-2">
-                  3. Destination scans the master QR + the same items.
+                  3. Destination scans the Master QR + the actual physical items.
                 </p>
                 <p>
-                  4. Same computation is repeated. Match = gate opens. Mismatch = gate stays closed. Check runs in RAM and disappears.
+                  4. Same math runs again. MATCH = accept. MISMATCH = reject. Nothing is stored.
                 </p>
               </div>
             )}
@@ -472,7 +475,7 @@ export default function GateCheckApp() {
         {screen === 'seal-result' && (
           <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3">
             <p className="text-center text-xs font-semibold uppercase tracking-wide" style={{ color: '#00e676' }}>
-              Master QR Code
+              Master Seal Created
             </p>
             <div className="rounded-xl p-3" style={{ backgroundColor: '#0a0a0a' }}>
               <div ref={qrContainerRef} className="[&_img]:mx-auto [&_canvas]:mx-auto" />
@@ -486,6 +489,11 @@ export default function GateCheckApp() {
                 {masterHash}
               </p>
             </div>
+
+            <p className="max-w-xs text-center text-xs leading-relaxed" style={{ color: '#888' }}>
+              Hash generated locally. Zero bytes sent to any server.<br />
+              Send this QR to the receiver by any channel. It cannot be tampered with.
+            </p>
 
             <div className="flex w-full gap-3">
               <button
@@ -528,7 +536,7 @@ export default function GateCheckApp() {
               style={{ width: '100%', height: '50vh' }}
             />
             <p className="text-center text-xs" style={{ color: '#555' }}>
-              Point camera at the Master QR code from the origin.
+              Point camera at the Master QR received from origin.
             </p>
             <button onClick={goHome} className="flex items-center justify-center gap-2 py-2 text-sm" style={{ color: '#666' }}>
               <RotateCcw size={14} /> Start Over
@@ -540,7 +548,7 @@ export default function GateCheckApp() {
         {screen === 'verify-step2' && (
           <div className="flex min-h-0 flex-1 flex-col gap-2">
             <p className="text-center text-xs font-semibold uppercase tracking-wide" style={{ color: '#00e676' }}>
-              Verify — Step 2: Scan Items
+              Verify — Step 2: Scan Physical Items
             </p>
             <div
               id={scannerDivId}
