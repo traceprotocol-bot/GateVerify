@@ -33,6 +33,7 @@ export default function GateCheckApp() {
   const [showHow, setShowHow] = useState(false)
   const scannerRef = useRef<any>(null)
   const qrContainerRef = useRef<HTMLDivElement>(null)
+  const lastScanRef = useRef<{ text: string; time: number }>({ text: '', time: 0 })
   const scannerDivId = 'qr-reader'
 
   const stopScanner = useCallback(async () => {
@@ -166,19 +167,27 @@ export default function GateCheckApp() {
     setScannedItems([])
     setMasterHash('')
     setStoredHash('')
+    lastScanRef.current = { text: '', time: 0 }
   }, [stopScanner])
 
   const startSeal = useCallback(() => {
     setScannedItems([])
     setMasterHash('')
+    lastScanRef.current = { text: '', time: 0 }
     setScreen('seal-scanning')
   }, [])
 
   useEffect(() => {
     if (screen === 'seal-scanning') {
       startScanner((text: string) => {
+        const now = Date.now()
+        if (text === lastScanRef.current.text && now - lastScanRef.current.time < 1800) {
+          return
+        }
+        lastScanRef.current = { text, time: now }
+
         setScannedItems((prev) => {
-          if (prev[prev.length - 1] === text) return prev
+          if (prev.includes(text)) return prev
           return [...prev, text]
         })
       })
@@ -201,6 +210,7 @@ export default function GateCheckApp() {
 
   const startVerify = useCallback(() => {
     setScannedItems([])
+    lastScanRef.current = { text: '', time: 0 }
     let preloaded = ''
     try {
       preloaded = localStorage.getItem('gatecheck_master_hash') || ''
@@ -224,6 +234,7 @@ export default function GateCheckApp() {
       localStorage.setItem('gatecheck_master_hash', masterHash)
     } catch {}
     setScannedItems([])
+    lastScanRef.current = { text: '', time: 0 }
     setStoredHash(masterHash)
     setScreen('verify-step2')
   }, [masterHash])
@@ -231,6 +242,12 @@ export default function GateCheckApp() {
   useEffect(() => {
     if (screen === 'verify-step1') {
       startScanner((text: string) => {
+        const now = Date.now()
+        if (text === lastScanRef.current.text && now - lastScanRef.current.time < 1800) {
+          return
+        }
+        lastScanRef.current = { text, time: now }
+
         setStoredHash(text)
         stopScanner()
         setScreen('verify-step2')
@@ -241,8 +258,14 @@ export default function GateCheckApp() {
   useEffect(() => {
     if (screen === 'verify-step2') {
       startScanner((text: string) => {
+        const now = Date.now()
+        if (text === lastScanRef.current.text && now - lastScanRef.current.time < 1800) {
+          return
+        }
+        lastScanRef.current = { text, time: now }
+
         setScannedItems((prev) => {
-          if (prev[prev.length - 1] === text) return prev
+          if (prev.includes(text)) return prev
           return [...prev, text]
         })
       })
