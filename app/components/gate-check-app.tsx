@@ -261,41 +261,37 @@ export default function GateCheckApp() {
   }, [scannedItems, storedHash, stopScanner])
 
   // ---------- RESULTS ----------
-  const linkedInPostUrl =
-    'https://www.linkedin.com/posts/victor-khalif-ltp_liabilitytrap-supplychain-lastmile-activity-7487550905509392384-R1gd'
-
   if (screen === 'result-match') {
     return (
       <div
         className="fixed inset-0 flex flex-col items-center justify-center px-6"
         style={{ backgroundColor: '#00e676' }}
       >
-        <CheckCircle2 size={80} color="#0a0a0a" />
+        <CheckCircle2 size={72} color="#0a0a0a" />
         <p className="mt-3 text-4xl font-bold" style={{ color: '#0a0a0a' }}>
           ✓ MATCH
         </p>
-        <p className="mt-6 max-w-sm text-center text-sm leading-relaxed" style={{ color: '#0a0a0a' }}>
-          Verification complete. No data stored. No server involved.
+
+        <p className="mt-6 max-w-sm text-center text-sm leading-relaxed font-medium" style={{ color: '#0a0a0a' }}>
+          The physical items are identical to what was sealed at origin.
+          <br /><br />
+          No database. No server. No data stored.
           <br />
-          <br />
-          This is the mathematical evidence layer that closes the liability gap at physical transfer.
-          <br />
-          <br />
-          Full architectural breakdown:
+          Just pure mathematical proof at the moment of handover.
         </p>
+
         <a
-          href={linkedInPostUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 flex w-full max-w-xs items-center justify-center rounded-lg px-6 py-4 text-base font-bold"
-          style={{ backgroundColor: '#0A66C2', color: '#ffffff', minHeight: 56 }}
+          href="mailto:architect@last-trace.net?subject=Request%20M%26A%20Data%20Room%20Access"
+          className="mt-8 flex w-full max-w-xs items-center justify-center rounded-xl px-6 py-4 text-base font-bold"
+          style={{ backgroundColor: '#0a0a0a', color: '#00e676', minHeight: 56 }}
         >
-          Read the analysis on LinkedIn
+          Request Data Room Access
         </a>
+
         <button
           onClick={goHome}
           className="mt-4 flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold"
-          style={{ backgroundColor: '#0a0a0a', color: '#f0f0f0', minHeight: 48 }}
+          style={{ backgroundColor: 'transparent', color: '#0a0a0a', border: '1.5px solid #0a0a0a', minHeight: 48 }}
         >
           <RotateCcw size={16} /> Start Over
         </button>
@@ -309,32 +305,31 @@ export default function GateCheckApp() {
         className="fixed inset-0 flex flex-col items-center justify-center px-6"
         style={{ backgroundColor: '#ff1744' }}
       >
-        <XCircle size={80} color="#0a0a0a" />
+        <XCircle size={72} color="#0a0a0a" />
         <p className="mt-3 text-4xl font-bold" style={{ color: '#0a0a0a' }}>
           ✗ MISMATCH
         </p>
-        <p className="mt-6 max-w-sm text-center text-sm leading-relaxed" style={{ color: '#0a0a0a' }}>
-          Mismatch detected. In a live gate this shipment is blocked.
+
+        <p className="mt-6 max-w-sm text-center text-sm leading-relaxed font-medium" style={{ color: '#0a0a0a' }}>
+          The physical items no longer match what was sealed at origin.
+          <br /><br />
+          In a live gate this shipment is rejected.
           <br />
-          <br />
-          You just saw the exact failure mode that leaves the middle party exposed to unprovable liability.
-          <br />
-          <br />
-          Full breakdown of the liability trap:
+          This is the exact failure that currently leaves the middle party with unprovable liability.
         </p>
+
         <a
-          href={linkedInPostUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 flex w-full max-w-xs items-center justify-center rounded-lg px-6 py-4 text-base font-bold"
-          style={{ backgroundColor: '#0A66C2', color: '#ffffff', minHeight: 56 }}
+          href="mailto:architect@last-trace.net?subject=Request%20M%26A%20Data%20Room%20Access"
+          className="mt-8 flex w-full max-w-xs items-center justify-center rounded-xl px-6 py-4 text-base font-bold"
+          style={{ backgroundColor: '#0a0a0a', color: '#ff1744', minHeight: 56 }}
         >
-          Read the analysis on LinkedIn
+          Request Data Room Access
         </a>
+
         <button
           onClick={goHome}
           className="mt-4 flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold"
-          style={{ backgroundColor: '#0a0a0a', color: '#f0f0f0', minHeight: 48 }}
+          style={{ backgroundColor: 'transparent', color: '#0a0a0a', border: '1.5px solid #0a0a0a', minHeight: 48 }}
         >
           <RotateCcw size={16} /> Start Over
         </button>
