@@ -4,22 +4,47 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import { ChunkLoadErrorHandler } from '@/components/chunk-load-error-handler'
 import Script from 'next/script'
+
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-sans' })
 const jakartaSans = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-display' })
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' })
 
 export const metadata = {
-  metadataBase: new URL(process.env.NEXTAUTH_URL || 'http://localhost:3000'),
-  title: 'GateCheck',
-  description: 'Simple mathematical verification of physical handovers',
+  metadataBase: new URL('https://last-trace.net'),
+  title: 'GateVerify | Live Mathematical Gate Verification — Last Trace Protocol™ V7',
+  description: 'Live browser demo of deterministic SHA-256 physical gate verification. MATCH or MISMATCH in under 100ms. Zero data retention. Zero PII. Part of Last Trace Protocol™ V7.',
+  robots: {
+    index: true,
+    follow: true,
+    'max-snippet': -1,
+    'max-image-preview': 'large' as const,
+  },
+  alternates: {
+    canonical: 'https://last-trace.net/gateverify',
+  },
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
   },
   openGraph: {
-    title: 'GateCheck',
-    description: 'Simple mathematical verification of physical handovers',
-    images: ['/og-image.png'],
+    type: 'website',
+    title: 'GateVerify | Live Mathematical Gate Verification — LTP™ V7',
+    description: 'Test the deterministic mathematical lock that stops document fraud at the physical gate. Zero data retention. MATCH or MISMATCH.',
+    url: 'https://last-trace.net/gateverify',
+    siteName: 'Last Trace Protocol™ V7',
+    images: [
+      {
+        url: 'https://last-trace.net/gateverify/og-image.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'GateVerify | Live Mathematical Gate Verification',
+    description: 'Deterministic SHA-256 verification at the physical gate. Zero storage. Binary MATCH/MISMATCH.',
+    images: ['https://last-trace.net/gateverify/og-image.png'],
   },
 }
 
@@ -35,7 +60,6 @@ export default function RootLayout({
         <meta name="theme-color" content="#0a0a0a" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-        <script src="https://apps.abacus.ai/chatllm/appllm-lib.js"></script>
       </head>
       <body className={`${dmSans.variable} ${jakartaSans.variable} ${jetbrainsMono.variable} font-sans`}>
         <Script
