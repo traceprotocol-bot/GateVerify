@@ -6,7 +6,7 @@ Stateless mathematical verification for physical handovers.
 GateVerify is a free, browser-based tool that performs instant SHA-256 seal & verify at the physical gate.  
 No data is stored. No backend required. No infrastructure.
 
-## Live Demo
+## Free Version
 
 - **GateVerify (Edge Sandbox):**  
   https://last-trace.net/gateverify
