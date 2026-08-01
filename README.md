@@ -80,6 +80,13 @@ Commercial use, integration and evaluation terms are described on the audit page
 
 ---
 
+## On-chain code stamp (Base)
+
+- Contract: `0x159d541FE0427845860F745f65F5242cf0e45b89`
+- Sourcify: https://repo.sourcify.dev/8453/0x159d541FE0427845860F745f65F5242cf0e45b89
+- SHA-256 of light build: `51E4FE1AFA8F93DBE522E7BDE1EF18B69BC13DE50ADA75B717DFFAF1376FE5AF`
+- Architect: Victor Khalif
+
 ## Contact
 
 Victor Khalif  
